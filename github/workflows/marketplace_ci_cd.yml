@@ -1,0 +1,34 @@
+name: Marketplace CI/CD Workflow
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14.x
+        
+    - name: Install dependencies
+      run: npm install
+      
+    - name: Compile contracts
+      run: truffle compile
+      
+    - name: Run tests
+      run: truffle test
+      
+    - name: Deploy contracts to testnet
+      run: truffle migrate --network rinkeby
+      env:
+        MNEMONIC: ${{ secrets.MNEMONIC }}
+        INFURA_API_KEY: ${{ secrets.INFURA_API_KEY }}
